@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>FPS</title>
+<meta name="author" content="Fkih Younes">
+</head>
+<body>
+<canvas id="canv" align="center">
+Your Navigator don't support canvas please update
+</canvas>
+<script>
+	
+ var canvas = document.getElementById("canv");	
+ var ctx = canvas.getContext("2d");
+canvas.style.borderColor = "#333";
+canvas.style.paddingLeft="0";
+canvas.style.paddingRight="0";
+canvas.style.marginLeft="auto";
+canvas.style.marginRight="auto";
+canvas.style.backgroundColor = "#ebebeb";
+canvas.style.borderStyle = "solid";
+canvas.style.display="block";
+canvas.style.cursor="crosshair";
+var width=window.innerWidth*(3/4);
+var height=window.innerHeight*(3/4);
+canvas.width=width;
+canvas.height=height;
+canvas.addEventListener("mousedown", getPosition, false);
+var xdessin=50;
+var ydessin=100;
+var estvide=true;
+var reste=5;
+var charge='r';
+var tue=true;
+var gameover=false;
+var start ;
+var who;
+var magasin=45;
+var  imgcrim= new Image();
+var imgino=new Image();
+var draww=new Image();
+var pos=70;
+var niceone=0;
+var badone=0;
+var retard=1000;
+var anim;
+var fault=new Image();
+var init=0;
+imgino.src='./ppeur.png';
+imgcrim.src = './crim.gif';
+fault.src='./danger.png';
+draww.src=imgcrim.src;
+init=1;
+imgcrim.onload=function(){criminel();}	
+
+
+var shoot = document.createElement('audio');
+	shoot.src='./shoot.mp3';
+
+var recharge = document.createElement('audio');
+	recharge.src='./reload.mp3';
+
+
+var empty = document.createElement('audio');
+	empty.src='./empty.mp3'
+
+var wrong = document.createElement('audio');
+	wrong.src='./wrong.mp3'
+
+var x ;
+var y ;
+var posx=canvas.width-30;
+var  imgballe= new Image();
+imgballe.src = './balle.gif';
+
+imgballe.onload=function(){balles();}	
+
+function balles() {
+    var i; 
+	var balx=canvas.width-30;
+	if((charge=='r')&&(magasin>=0)){
+	ctx.clearRect(0,canvas.height-20,canvas.width,20);
+	recharge.play();
+	if(magasin>=5){
+	for (i=0;i<5;i++){
+	ctx.drawImage(imgballe,balx,canvas.height-20,20,20);
+	balx=balx-25;
+	}
+	magasin-=(5-reste);
+	estvide=false;
+	}
+	else{
+	for (i=0;i<(magasin+reste);i++){
+	ctx.drawImage(imgballe,balx,canvas.height-20,20,20);
+	balx=balx-25;
+	}magasin=0;
+	estvide=true;}
+	
+	posx=canvas.width-30;
+	reste=5;
+	charge='';
+	}
+	else if (!(estvide)&&(reste>=0)&&charge=='')
+	{reste--;
+     ctx.clearRect(posx,canvas.height-20,20,20);
+	 if(reste==0){estvide=true;}
+	 posx-=25;		 
+	}
+		  ctx.clearRect(10,canvas.height-20,50,20);
+		  ctx.drawImage(imgballe,10,canvas.height-20,20,20);
+	      ctx.font = "10pt Calibri,Geneva,Arial";
+		  if(magasin>5){
+	      ctx.fillStyle = "green";}
+	      else{ctx.fillStyle = "red";}
+	      ctx.fillText(magasin,30,canvas.height-10);
+ }
+	
+function getPosition(event)
+      {
+       	
+        if(!gameover){
+
+        if (event.x != undefined && event.y != undefined) //Chrome IE Opera Safari
+        {
+          x = event.x;
+          y = event.y;
+        }
+        else // Firefox method to get the position
+        {
+          x = event.clientX + document.body.scrollLeft +
+              document.documentElement.scrollLeft;
+          y = event.clientY + document.body.scrollTop +
+              document.documentElement.scrollTop;
+        }
+
+        x -= canvas.offsetLeft;
+        y -= canvas.offsetTop;
+		if(!estvide){
+		var tmp=badone;
+		shoot.currentTime=0;//onclick force lecture of audio
+		shoot.play();
+		balles();
+		criminel();			
+		precision();
+		console.log(tmp);
+		console.log(badone);
+		if(!(badone==tmp)){
+			shoot.pause();
+			wrong.currentTime=0;
+			wrong.play();}
+		}
+		else{empty.currentTime=0;
+				empty.play();}
+		}
+		 
+	  }
+
+
+function criminel(){
+	console.log(reste);
+	console.log(magasin);
+    if(badone==2){gameover=true;}
+	if((!gameover)&&((magasin>0)||(reste>0))){
+	if(tue){
+	if((draww==imgino)){badone++;}	
+	ctx.clearRect(xdessin,ydessin,imgcrim.width,imgcrim.height+2);
+	do 
+	{
+		xdessin=canvas.width*Math.random();
+		ydessin=canvas.height*Math.random();
+		
+	}
+	while((xdessin>(canvas.width-imgcrim.width))||(ydessin>(canvas.height-imgcrim.height-22)))  
+	who=parseInt(34*Math.random());
+	if((who%2==0)&&(init>0)){draww=new Image();
+							 	draww.src=imgcrim.src;}
+	else{draww=new Image();
+		 draww.src=imgino.src;}
+	ctx.drawImage(draww,xdessin,ydessin,imgcrim.width,imgcrim.height);
+	start = new Date().getTime(); 
+	tue=false;
+	}
+	else {tue=true;}
+	}
+	else if(gameover||((reste<=0)&&(magasin==0))) {
+			 										defaite();
+		 										   }
+}
+	
+function precision(){
+	if(draww.src==imgcrim.src){
+	      if(((x-xdessin)>=42)&&(((x-xdessin)<=90)&&((y-ydessin)>=0)&&((y-ydessin)<=39))){tue=true;niceone++;}
+		  if(((x-xdessin)>=42)&&(((x-xdessin)<=77)&&((y-ydessin)>=39)&&((y-ydessin)<=60))){tue=true;niceone++;}
+		  if(((x-xdessin)>=39)&&(((x-xdessin)<=98)&&((y-ydessin)>=60)&&((y-ydessin)<=112))){tue=true;niceone++;}
+					}
+	else if(draww.src==imgino.src)
+					{ 
+					 if(((x-xdessin)>=33)&&(((x-xdessin)<=112)&&((y-ydessin)>=11)&&((y-ydessin)<=81))){tue=true;badone++;ctx.drawImage(fault,pos,canvas.height-20,20,20);
+   pos=pos+30;}
+		  			 if(((x-xdessin)>=52)&&(((x-xdessin)<=102)&&((y-ydessin)>=81)&&((y-ydessin)<=125))){tue=true;badone++;ctx.drawImage(fault,pos,canvas.height-20,20,20);
+   pos=pos+30;}
+					 }	
+}
+
+function reload(e) {
+   if ((e.keyCode==82)){ctx.clearRect(0,canvas.height-20,canvas.width,20);
+	if(magasin==0){charge='';}
+	 else {charge='r';}
+   balles();}
+   var j=0;
+   pos=70;
+   while((j<badone)&&j<2)
+   {ctx.drawImage(fault,pos,canvas.height-20,20,20);
+   pos=pos+30;
+   j++;}
+}
+	document.onkeydown=reload;
+	window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  function step(timestamp) {
+   var progress;
+   if(start == null)
+	  start = timestamp;
+      progress = timestamp - start;
+	  criminel();	  
+  if(progress<1000){  
+	  start=null;
+	  if((magasin<41)&&(magasin>30)){retard=500;}
+	  if((magasin<31)&&(magasin>24)){retard=400;}
+	  if((magasin<25)&&(magasin>10)){retard=300;}
+	  if(magasin<11){retard=200;}
+	  setTimeout(function(){anim=requestAnimationFrame(step);},retard);
+  }
+  else
+  {
+	  progress=0;
+	  requestAnimationFrame(step);
+  }    
+  }
+function defaite(){
+		var msg;
+		ctx.clearRect(0,canvas.height-20,canvas.width,20);
+	    ctx.font = "10pt Calibri,Geneva,Arial";
+		ctx.fillStyle = "blue";
+	    if(badone==2){
+				  	  msg="You have to learn how to shoot ,We don't shoot innocent people";
+		             }	
+	    else
+			{
+			  var average=(niceone/50)*100;
+			  msg="T'as eu une moyenne de tir de "+average+" %";
+			}
+	    ctx.fillText(msg,30,canvas.height-10);
+}
+requestAnimationFrame(step);
+</script>
+</body>
+</html>
